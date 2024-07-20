@@ -88,19 +88,24 @@ namespace ApiRequest.Net.Servies
                 return bool.Parse(json);
             if (type.IsPrimitive)
                 return Convert.ChangeType(json, type);
-            if (typeof(IEnumerable).IsAssignableFrom(type))
+            if (typeof(IEnumerable).IsAssignableFrom(type) && type.IsGenericType)
                 return DeserializeEnumerable(json, type);
+            if (type == typeof(DateTime))
+                return DateTime.Parse(json.Trim('"'));
+            if (type == typeof(DateTime?))
+                return string.IsNullOrEmpty(json) ? (DateTime?)null : DateTime.Parse(json.Trim('"'));
 
             var obj = Activator.CreateInstance(type);
             var properties = type.GetProperties();
-            var matches = Regex.Matches(json, "\"(\\w+)\":(.*?)(,|})");
+
+            var matches = Regex.Matches(json, "\"(\\w+)\":\\s*(\"[^\"]*\"|[^,\\}]+)");
 
             foreach (Match match in matches)
             {
                 var propertyName = match.Groups[1].Value;
                 var value = match.Groups[2].Value.Trim();
 
-                var property = Array.Find(properties, p => p.Name == propertyName);
+                var property = Array.Find(properties, p => string.Equals(p.Name, propertyName, StringComparison.OrdinalIgnoreCase));
                 if (property != null)
                 {
                     var propertyValue = Deserialize(value, property.PropertyType);
@@ -113,26 +118,19 @@ namespace ApiRequest.Net.Servies
 
         private object DeserializeEnumerable(string json, Type type)
         {
-            var elementType = type.IsArray ? type.GetElementType() : type.GenericTypeArguments[0];
-            var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
+            var itemType = type.GetGenericArguments()[0];
+            var listType = typeof(List<>).MakeGenericType(itemType);
+            var list = (IList)Activator.CreateInstance(listType);
 
-            var matches = Regex.Matches(json, "(\".*?\"|\\d+|true|false|null)(,|])");
-
+            var matches = Regex.Matches(json, "(\\[|,)?\\s*([^\\[\\],]+?)\\s*(\\]|,)?");
             foreach (Match match in matches)
             {
-                if (match.Value == "]")
-                    break;
-
-                var value = match.Groups[1].Value;
-                var element = Deserialize(value, elementType);
-                list.Add(element);
-            }
-
-            if (type.IsArray)
-            {
-                var array = Array.CreateInstance(elementType, list.Count);
-                list.CopyTo(array, 0);
-                return array;
+                var value = match.Groups[2].Value.Trim();
+                if (!string.IsNullOrEmpty(value))
+                {
+                    var item = Deserialize(value, itemType);
+                    list.Add(item);
+                }
             }
 
             return list;
