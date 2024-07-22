@@ -18,164 +18,38 @@ namespace ApiRequest.Net.Servies
             _jsonConvertor = jsonConvertor ?? throw new ArgumentNullException(nameof(jsonConvertor));
         }
 
-        public async Task<object> SendDeletRequest<T>(string urlt, object? data = null, string jwt = "")
+        public async Task<object> SendRequest<T>(HttpMethod method, string url, object? data, string jwt)
         {
-            var request = new HttpRequestMessage();
+            var request = new HttpRequestMessage(method, url);
 
-            if (data != null)
+            if(data != null)
             {
                 var json = _jsonConvertor.JsonSerializer(data);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                request.Content = content;
+                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
             }
-            request.Method = HttpMethod.Delete;
-            request.RequestUri = new Uri(urlt);
-
-            if (string.IsNullOrEmpty(jwt))
+            if (!string.IsNullOrEmpty(jwt))
                 request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwt);
 
-            var responseMessageWithData = await _client.SendAsync(request);
-
-            if (responseMessageWithData.IsSuccessStatusCode)
+            try
             {
-                var response = await responseMessageWithData.Content.ReadAsStringAsync();
-                var objects = _jsonConvertor.JsonDeserialize<T>(response);
+                var responeMessage = await _client.SendAsync(request);
+                if(responeMessage.IsSuccessStatusCode)
+                {
+                    var respone = await responeMessage.Content.ReadAsStringAsync();
+                    var objects = _jsonConvertor.JsonDeserialize<T>(respone);
 
-                if (objects != null)
-                    return objects;
+                    if (objects != null) 
+                        return objects;
 
-                return "having trouble returning object";
+                    return "Having Trouble With Returning Object";
+                }
+
+                return "Response Message : " + responeMessage;
             }
-
-            return responseMessageWithData;
-        }
-
-        public async Task<object> SendGetRequest<T>(string urlt, object? data = null, string jwt = "")
-        {
-            var request = new HttpRequestMessage();
-
-            if (data != null)
+            catch (Exception ex)
             {
-                var json = _jsonConvertor.JsonSerializer(data);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                request.Content = content;
+                return "Error Message : " + ex.Message;
             }
-            request.Method = HttpMethod.Get;
-            request.RequestUri = new Uri(urlt);
-
-            if (string.IsNullOrEmpty(jwt))
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwt);
-
-            var responseMessageWithData = await _client.SendAsync(request);
-
-            if (responseMessageWithData.IsSuccessStatusCode)
-            {
-                var response = await responseMessageWithData.Content.ReadAsStringAsync();
-                var objects = _jsonConvertor.JsonDeserialize<T>(response);
-
-                if (objects != null)
-                    return objects;
-
-                return "having trouble returning object";
-            }
-
-            return responseMessageWithData;
-        }
-
-        public async Task<object> SendPatchRequest<T>(string urlt, object? data = null, string jwt = "")
-        {
-            var request = new HttpRequestMessage();
-
-            if (data != null)
-            {
-                var json = _jsonConvertor.JsonSerializer(data);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                request.Content = content;
-            }
-            request.Method = HttpMethod.Patch;
-            request.RequestUri = new Uri(urlt);
-
-            if (string.IsNullOrEmpty(jwt))
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwt);
-
-            var responseMessageWithData = await _client.SendAsync(request);
-
-            if (responseMessageWithData.IsSuccessStatusCode)
-            {
-                var response = await responseMessageWithData.Content.ReadAsStringAsync();
-                var objects = _jsonConvertor.JsonDeserialize<T>(response);
-
-                if (objects != null)
-                    return objects;
-
-                return "having trouble returning object";
-            }
-
-            return responseMessageWithData;
-        }
-
-        public async Task<object> SendPostRequest<T>(string urlt, object? data = null, string jwt = "")
-        {
-            var request = new HttpRequestMessage();
-
-            if (data != null)
-            {
-                var json = _jsonConvertor.JsonSerializer(data);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                request.Content = content;
-            }
-            request.Method = HttpMethod.Post;
-            request.RequestUri = new Uri(urlt);
-
-            if (string.IsNullOrEmpty(jwt))
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwt);
-
-            var responseMessageWithData = await _client.SendAsync(request);
-
-            if (responseMessageWithData.IsSuccessStatusCode)
-            {
-                var response = await responseMessageWithData.Content.ReadAsStringAsync();
-                var objects = _jsonConvertor.JsonDeserialize<T>(response);
-
-                if (objects != null)
-                    return objects;
-
-                return "having trouble returning object";
-            }
-
-            return responseMessageWithData;
-        }
-
-        public async Task<object> SendPutRequest<T>(string urlt, object? data = null, string jwt = "")
-        {
-            var request = new HttpRequestMessage();
-
-            if (data != null)
-            {
-                var json = _jsonConvertor.JsonSerializer(data);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                request.Content = content;
-            }
-            request.Method = HttpMethod.Put;
-            request.RequestUri = new Uri(urlt);
-
-            if (string.IsNullOrEmpty(jwt))
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwt);
-
-            var responseMessageWithData = await _client.SendAsync(request);
-
-            if (responseMessageWithData.IsSuccessStatusCode)
-            {
-                var response = await responseMessageWithData.Content.ReadAsStringAsync();
-                var objects = _jsonConvertor.JsonDeserialize<T>(response);
-
-                if (objects != null)
-                    return objects;
-
-                return "having trouble returning object";
-            }
-
-            return responseMessageWithData;
         }
     }
 }
