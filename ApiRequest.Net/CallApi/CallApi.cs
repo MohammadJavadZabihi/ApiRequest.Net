@@ -1,7 +1,9 @@
 ﻿using ApiRequest.Net.Servies.InterFace;
+using ApiRequest.Net.Servies.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,15 +17,58 @@ namespace ApiRequest.Net.CallApi
             _callServies = apiCallServies ?? throw new ArgumentException(nameof(apiCallServies));
         }
 
-        public async Task<object> SendDeletRequest<T>(string urlt, object? data = null, string jwt = "") => await _callServies.SendRequest<T>(HttpMethod.Delete, urlt, data, jwt);
+        public async Task<ApiResponse<T>> SendDeletRequest<T>(string urlt, object? data = null, string jwt = "")
+        {
+            var response = await _callServies.SendRequest<T>(HttpMethod.Delete, urlt, data, jwt);
 
-        public async Task<object> SendGetRequest<T>(string urlt, object? data = null, string jwt = "") => await _callServies.SendRequest<T>(HttpMethod.Get, urlt, data, jwt);
+            return new ApiResponse<T>
+            {
+                Data = response.Data,
+                IsSuccess = response.IsSuccess,
+                Message = response.Message
+            };
+        }
 
-        public async Task<object> SendPatchRequest<T>(string urlt, object? data = null, string jwt = "") => await _callServies.SendRequest<T>(HttpMethod.Patch, urlt, data, jwt);
+        public async Task<ApiResponse<T>> SendGetRequest<T>(string urlt, object? data = null, string jwt = "")
+        {
+            return await _callServies.SendRequest<T>(HttpMethod.Get, urlt, data, jwt);
+        }
 
-        public async Task<object> SendPostRequest<T>(string urlt, object? data = null, string jwt = "") => await _callServies.SendRequest<T>(HttpMethod.Post, urlt, data, jwt);
+        public async Task<ApiResponse<T>> SendPatchRequest<T>(string urlt, object? data = null, string jwt = "")
+        {
+            var response = await _callServies.SendRequest<T>(HttpMethod.Patch, urlt, data, jwt);
 
-        public async Task<object> SendPutRequest<T>(string urlt, object? data = null, string jwt = "") => await _callServies.SendRequest<T>(HttpMethod.Put, urlt, data, jwt);
+            return new ApiResponse<T>
+            {
+                Data = response.Data,
+                IsSuccess = response.IsSuccess,
+                Message = response.Message
+            };
+        }
+
+        public async Task<ApiResponse<T>> SendPostRequest<T>(string urlt, object? data = null, string jwt = "")
+        {
+            var response = await _callServies.SendRequest<T>(HttpMethod.Post, urlt, data, jwt);
+
+            return new ApiResponse<T>
+            {
+                Data = response.Data,
+                IsSuccess = response.IsSuccess,
+                Message = response.Message
+            };
+        }
+
+        public async Task<ApiResponse<T>> SendPutRequest<T>(string urlt, object? data = null, string jwt = "")
+        {
+            var response = await _callServies.SendRequest<T>(HttpMethod.Put, urlt, data, jwt);
+
+            return new ApiResponse<T>
+            {
+                Data = response.Data,
+                IsSuccess = response.IsSuccess,
+                Message = response.Message
+            };
+        }
 
     }
 }
