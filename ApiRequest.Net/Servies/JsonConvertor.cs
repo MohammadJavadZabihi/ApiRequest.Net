@@ -14,6 +14,7 @@ namespace ApiRequest.Net.Servies
 {
     public class JsonConvertor : IJsonConvertorServies
     {
+
         private string JsonIEnumSerialize(IEnumerable ienum)
         {
             var json = new StringBuilder();

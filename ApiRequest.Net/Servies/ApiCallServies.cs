@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace ApiRequest.Net.Servies
 {
@@ -19,7 +20,7 @@ namespace ApiRequest.Net.Servies
 
             if(data != null)
             {
-                var json = _jsonConvertor.JsonSerializer(data);
+                var json = JsonConvert.SerializeObject(data);
                 request.Content = new StringContent(json, Encoding.UTF8, "application/json");
             }
             if (!string.IsNullOrEmpty(jwt))
@@ -31,7 +32,7 @@ namespace ApiRequest.Net.Servies
                 if(responeMessage.IsSuccessStatusCode)
                 {
                     var respone = await responeMessage.Content.ReadAsStringAsync();
-                    var objects = _jsonConvertor.JsonDeserialize<T>(respone);
+                    var objects = JsonConvert.DeserializeObject<T>(respone);
 
                     if (objects != null)
                     {
