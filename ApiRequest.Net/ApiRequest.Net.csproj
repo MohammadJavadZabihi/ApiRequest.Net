@@ -5,7 +5,13 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Version>1.0.5</Version>
+		<Version>1.1.0</Version>
+		<id>ApiRequest.Net</id>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<description>
+			APIRequest - A Powerful Package for API Requests: APIRequest is a NuGet package designed to simplify sending and receiving HTTP/HTTPS requests to web APIs. This package helps developers easily access external resources, send data, and handle responses with minimal code.Features: Support for Multiple HTTP Methods: Including GET, POST, PUT, DELETE, and more., Simple Management of Headers and Parameters: Allows adding custom headers and parameters to requests., Easy Serialization and Deserialization: Full support for JSON using Newtonsoft.Json for data management., Support for Authentication: Ability to use JWT tokens and other authentication methods., Error Handling: Advanced features for handling errors and response statuses.
+		</description>
+		<authors>https://github.com/MohammadJavadZabihi/ApiRequest.Net</authors>
 	</PropertyGroup>
 
 	<ItemGroup>

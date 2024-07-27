@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace ApiRequest.Net.Servies
 {
-    public class ApiCallServies : IApiCallServies
+    public class ApiCallServies
     {
         public async Task<ApiResponse<T>> SendRequest<T>(HttpMethod method, string url, object? data, string jwt)
         {
@@ -29,6 +29,7 @@ namespace ApiRequest.Net.Servies
             try
             {
                 var responeMessage = await _client.SendAsync(request);
+                var statucCode = responeMessage.StatusCode;
                 if(responeMessage.IsSuccessStatusCode)
                 {
                     var respone = await responeMessage.Content.ReadAsStringAsync();
@@ -40,14 +41,16 @@ namespace ApiRequest.Net.Servies
                         {
                             Data = objects,
                             IsSuccess = true,
-                            Message = "Request Is Successfully"
+                            Message = "Request Is Successfully",
+                            StatusCode = statucCode
                         };
                     }
                     return new ApiResponse<T>
                     {
                         Data = default(T),
                         IsSuccess = false,
-                        Message = "Error Message : " + respone
+                        Message = "Error Message : " + respone,
+                        StatusCode = statucCode
                     };
                 }
 
@@ -55,7 +58,8 @@ namespace ApiRequest.Net.Servies
                 {
                     Data = default(T),
                     IsSuccess = false,
-                    Message = "Error Message : " + await responeMessage.Content.ReadAsStringAsync()
+                    Message = "Error Message : " + await responeMessage.Content.ReadAsStringAsync(),
+                    StatusCode = statucCode
                 };
             }
             catch (Exception ex)
@@ -64,7 +68,8 @@ namespace ApiRequest.Net.Servies
                 {
                     Data = default(T),
                     IsSuccess = false,
-                    Message = "Error Message : " + ex.Message
+                    Message = "Error Message : " + ex.Message,
+                    StatusCode = null   
                 };
             }
         }
