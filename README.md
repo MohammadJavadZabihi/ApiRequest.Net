@@ -16,19 +16,23 @@ Error Handling: Advanced features for handling errors and response statuses.
 To install the APIRequest.net package, simply run the following command in the NuGet Package Manager console:
 
 
-"dotnet add package ApiRequest.Net --version 1.0.8"
+"dotnet add package ApiRequest.Net --version 1.1.0"
 
 ## Example Code:
 
 ### First, you need to add the necessary dependencies in the program.cs:
 
-builder.Services.AddTransient<ICallApiServies, CallApi>();
-builder.Services.AddTransient<IApiCallServies, ApiCallServies>();
+builder.Services.AddTransient<CallApi>();
 
 ### After that, You must add this dependency in the constructor of the class you want to use this package. For example, I took the user altogether:
 <hr></hr>
+private readonly CallApi _callApiServies;
+public HomeController(CallApi callApiServies)
+{
+    _callApiServies = callApiServies ?? throw new ArgumentException(nameof(callApiServies));
+}
 
-![Screenshot (1208)3434343](https://github.com/user-attachments/assets/a9c2ff5e-2e54-4914-8443-b3bd8ff901a7)
+or you can just create instance of CallApi Class
 
 ### And then you create the data as follows and pass the method parameters to it:
 
@@ -46,3 +50,4 @@ var response = await _callApiServies.SendPostRequest<List<UserRegisterViewModel>
 ### response.IsSuccess : Api Send Status | return (bool)
 ### response.Data : Data received from the server to which we called api | return (T) or (object)
 ### response.Message : The message that the server sent to us or the error that occurred while doing the work | return (string)
+### response.StatusCode : Status Code WhiCh Server Response to us | return System.Net.HttpStatusCode
